@@ -1,0 +1,121 @@
+- name: "install build depends"
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    install_recommends: no
+  with_items:
+    - build-essential
+    - libcurl4-openssl-dev
+    - libmysqlclient-dev
+    - libreadline-dev
+    - libreadline6-dev
+    - libssl-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - zlib1g-dev
+    - libmagickwand-dev
+  tags:
+    - apt
+    - ruby
+
+- name: "update rbenv repo"
+  git:
+    repo: "https://github.com/sstephenson/rbenv.git"
+    dest: "{{ rbenv_root }}"
+    version: "HEAD"
+  become: yes
+  become_user: "{{ deploy_user }}"
+  tags:
+    - ruby
+
+- name: "create plugins directory"
+  file:
+    path: "{{ rbenv_root }}/plugins"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: 0755
+    state: directory
+  tags:
+    - ruby
+
+- name: "clone ruby-build repo"
+  git:
+    repo: "https://github.com/sstephenson/ruby-build.git"
+    dest: "{{ rbenv_root }}/plugins/ruby-build"
+    version: "HEAD"
+  become: yes
+  become_user: "{{ deploy_user }}"
+  tags:
+    - ruby
+
+- name: "Append rbenv bin to the PATH variable"
+  lineinfile:
+    dest: '~/.profile'
+    state: 'present'
+    line: 'export PATH="{{ deploy_home_dir }}/.rbenv/bin:$PATH"'
+  become: yes
+  become_user: "{{ deploy_user }}"
+  tags:
+    - ruby
+
+- name: "Init rbenv for ssh sessions"
+  lineinfile:
+    dest: '{{ deploy_home_dir }}/.profile'
+    state: 'present'
+    line: 'eval "$(rbenv init -)"'
+  become: yes
+  become_user: "{{ deploy_user }}"
+  tags:
+    - ruby
+
+- name: "install ruby version"
+  command: "rbenv install {{ ruby_version }}"
+  args:
+    creates: "{{ rbenv_root }}/versions/{{ ruby_version }}/bin/ruby"
+  become: yes
+  become_user: "{{ deploy_user }}"
+  environment:
+    RBENV_ROOT: "{{ rbenv_root }}"
+    PATH: '{{ rbenv_root }}/bin:{{ rbenv_root }}/shims:{{ ansible_env.PATH }}'
+  notify:
+    - rbenv rehash
+  tags:
+    - ruby
+
+- name: "set global ruby version"
+  command: "rbenv global {{ ruby_version }}"
+  become: yes
+  become_user: "{{ deploy_user }}"
+  environment:
+    RBENV_ROOT: "{{ rbenv_root }}"
+    PATH: '{{ rbenv_root }}/bin:{{ rbenv_root }}/shims:{{ ansible_env.PATH }}'
+  notify:
+    - rbenv rehash
+  tags:
+    - ruby
+
+- name: "set gemrc"
+  template:
+    src: "gemrc.j2"
+    dest: "{{ deploy_home_dir }}/.gemrc"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: 0644
+  tags:
+    - ruby
+
+- name: "install global gems"
+  gem:
+    name: "{{ item }}"
+    state: "latest"
+    executable: "{{ rbenv_root }}/shims/gem"
+    user_install: "no"
+  become: yes
+  become_user: "{{ deploy_user }}"
+  with_items:
+    - bundler
+    - foreman
+  notify:
+    - rbenv rehash
+  tags:
+    - ruby

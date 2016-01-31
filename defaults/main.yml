@@ -1,0 +1,5 @@
+deploy_user: deploy
+deploy_group: deploy
+deploy_home_dir: /home/deploy
+rbenv_root: "/home/deploy/.rbenv"
+ruby_version: 1.9.3-p484
