@@ -1,0 +1,7 @@
+---
+- hosts: all
+  roles:
+    - role: ruby
+      ruby_user: vagrant
+      ruby_group: vagrant
+      ruby_versions: ["2.4.1", "2.3.3", "2.4.2"]

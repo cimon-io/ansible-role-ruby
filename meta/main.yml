@@ -1,12 +1,9 @@
 galaxy_info:
   author: Alexey Osipenko
-  description: install ruby and rbenv
+  description: Install and configure ruby and rbenv
   company: Cimon.io
-
   license: MIT
-
   min_ansible_version: 2.0.0
-
   platforms:
     - name: Ubuntu
       versions:
@@ -14,9 +11,7 @@ galaxy_info:
     - name: Debian
       versions:
       - all
-
-  galaxy_tags: []
-
-dependencies:
-  - role: deploy-user
-
+  galaxy_tags:
+    - ruby
+    - rbenv
+dependencies: []

@@ -1,0 +1,16 @@
+---
+ansible_become: yes
+
+apt_cache_valid_time: 86400
+
+ruby_software_dependencies:
+  - build-essential
+  - libcurl4-openssl-dev
+  - libmysqlclient-dev
+  - libreadline-dev
+  - libreadline6-dev
+  - libssl-dev
+  - libxml2-dev
+  - libxslt1-dev
+  - zlib1g-dev
+  - libmagickwand-dev
