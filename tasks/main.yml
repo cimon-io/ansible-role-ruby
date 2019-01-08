@@ -110,13 +110,16 @@
     user_install: "no"
   environment:
     RBENV_VERSION: "{{ item[0] }}"
-  become: true
-  become_user: "{{ ruby_user }}"
   with_nested:
     - "{{ ruby_versions }}"
     - "{{ ruby_global_gems }}"
   notify:
     - rbenv rehash
+  become: true
+  become_user: "{{ ruby_user }}"
+  retries: "{{ remote_package_retries }}"
+  register: gem_result
+  until: gem_result is succeeded
   tags:
     - ruby
 

@@ -1,3 +1,4 @@
 - name: "rbenv rehash"
   command: "{{ ruby_user_home }}/.rbenv/bin/rbenv rehash"
+  become: true
   become_user: "{{ ruby_user }}"
