@@ -15,12 +15,15 @@
 
 - name: "install build depends"
   apt:
-    pkg: "{{ item }}"
+    pkg: "{{ ruby_software_dependencies }}"
     state: present
     install_recommends: no
     update_cache: yes
     cache_valid_time: "{{ apt_cache_valid_time }}"
-  with_items: "{{ ruby_software_dependencies }}"
+  retries: "{{ remote_package_retries }}"
+  register: apt_result
+  until: apt_result is succeeded
+  become: true
   tags:
     - ruby
 
@@ -29,6 +32,7 @@
     repo: "https://github.com/rbenv/rbenv.git"
     dest: "{{ ruby_user_home }}/.rbenv"
     version: "{{ ruby_rbenv_version }}"
+  become: true
   become_user: "{{ ruby_user }}"
   tags:
     - ruby
@@ -40,6 +44,7 @@
     group: "{{ ruby_group }}"
     mode: 0755
     state: directory
+  become: true
   tags:
     - ruby
 
@@ -48,6 +53,7 @@
     repo: "https://github.com/rbenv/ruby-build.git"
     dest: "{{ ruby_user_home }}/.rbenv/plugins/ruby-build"
     version: "master"
+  become: true
   become_user: "{{ ruby_user }}"
   tags:
     - ruby
@@ -59,6 +65,7 @@
     owner: "root"
     group: "root"
     mode: 0755
+  become: true
   tags:
     - ruby
 
@@ -66,6 +73,7 @@
   shell: "/bin/bash -lc 'rbenv install {{ item }}'"
   args:
     creates: "{{ ruby_user_home }}/.rbenv/versions/{{ item }}/bin/ruby"
+  become: true
   become_user: "{{ ruby_user }}"
   with_items: "{{ ruby_versions }}"
   notify:
@@ -75,6 +83,7 @@
 
 - name: "set global ruby version"
   shell: "/bin/bash -lc 'rbenv global {{ ruby_global_version }}'"
+  become: true
   become_user: "{{ ruby_user }}"
   when: ruby_versions | length > 0
   notify:
@@ -89,6 +98,7 @@
     owner: "{{ ruby_user }}"
     group: "{{ ruby_group }}"
     mode: 0644
+  become: true
   tags:
     - ruby
 
@@ -100,6 +110,7 @@
     user_install: "no"
   environment:
     RBENV_VERSION: "{{ item[0] }}"
+  become: true
   become_user: "{{ ruby_user }}"
   with_nested:
     - "{{ ruby_versions }}"
