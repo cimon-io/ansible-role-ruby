@@ -30,9 +30,9 @@ ruby_group: deploy   # The user name and group must be present in the system
 Specify rbenv and ruby versions which should be installed:
 
 ```yaml
-ruby_rbenv_version: "v1.1.1"  # rbenv version
+ruby_rbenv_version: "v1.1.2"  # rbenv version
 ruby_versions:                # list of ruby versions
-  - "2.4.1"
+  - "2.6.4"
 ```
 
 The first of the requested ruby versions (if there is any) will be set as global:
@@ -40,9 +40,7 @@ The first of the requested ruby versions (if there is any) will be set as global
 ```yaml
 ruby_global_version: "{{ ruby_versions[0] | default('') }}"
 
-ruby_global_gems:    # list of ruby global gems to install
-  - bundler
-  - foreman
+ruby_global_gems: []    # list of ruby global gems to install
 ```
 
 All necessary dependencies and other variables are specified at `vars/main`:
@@ -78,8 +76,8 @@ A playbook example:
   roles:
     - role: ruby
       ruby_versions:
-        - "2.4.1"
-        - "2.4.0"
+        - "2.6.3"
+        - "2.6.4"
 ```
 
 An example of variables:
@@ -87,7 +85,7 @@ An example of variables:
 ```yaml
 ruby_user: developer           # A user under whom the role is run
 ruby_group: developer          # The user name and group must be present in the system
-ruby_versions: ["2.4.1", "2.3.3", "2.4.2"]  # Ruby version which will be installed
+ruby_versions: ["2.5.3", "2.6.4"]  # Ruby version which will be installed
 ```
 
 ## License
