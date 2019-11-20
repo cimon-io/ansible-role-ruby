@@ -2,13 +2,11 @@
 ruby_user: "deploy"
 ruby_group: "deploy"
 
-ruby_rbenv_version: "v1.1.1"
+ruby_rbenv_version: "v1.1.2"
 
 ruby_versions:
-  - "2.4.1"
+  - "2.6.4"
 
 ruby_global_version: "{{ ruby_versions[0] | default('') }}"
 
-ruby_global_gems:
-  - bundler
-  - foreman
+ruby_global_gems: []
